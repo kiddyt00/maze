@@ -237,47 +237,48 @@ export class SceneBuilder {
     const uy: number = rz * fx - rx * fz;
     const uz: number = rx * fy - ry * fx;
 
-    // 旋转矩阵列: [right, up, -forward]
-    const m00: number = rx;
-    const m01: number = ry;
-    const m02: number = rz;
-    const m10: number = ux;
-    const m11: number = uy;
-    const m12: number = uz;
-    const m20: number = -fx;
-    const m21: number = -fy;
-    const m22: number = -fz;
-
-    const trace: number = m00 + m11 + m22;
-    let qx: number = 0;
-    let qy: number = 0;
-    let qz: number = 0;
-    let qw: number = 1;
-    if (trace > 0) {
-      const s: number = Math.sqrt(trace + 1) * 2;
-      qw = 0.25 * s;
-      qx = (m21 - m12) / s;
-      qy = (m02 - m20) / s;
-      qz = (m10 - m01) / s;
-    } else if (m00 > m11 && m00 > m22) {
-      const s: number = Math.sqrt(1 + m00 - m11 - m22) * 2;
-      qw = (m21 - m12) / s;
-      qx = 0.25 * s;
-      qy = (m01 + m10) / s;
-      qz = (m02 + m20) / s;
-    } else if (m11 > m22) {
-      const s: number = Math.sqrt(1 + m11 - m00 - m22) * 2;
-      qw = (m02 - m20) / s;
-      qx = (m01 + m10) / s;
-      qy = 0.25 * s;
-      qz = (m12 + m21) / s;
+    // 旋转矩阵转四元数: 必须用 OpenHarmony 官方可运行示例 how-to-build-3d-model-viewer
+    // 的 Utils.lookAt 算法。标准 Shepperd 方法会得到其共轭(=逆旋转), 使相机朝反方向看
+    // (俯瞰变仰望 → 只看到 clearColor, 看不到棋盘) —— 这就是此前全灰屏的根因。
+    // m0=right=(rx,ry,rz), m1=up'=(ux,uy,uz), m2=backward=-f=(m2x,m2y,m2z)
+    const m2x: number = -fx;
+    const m2y: number = -fy;
+    const m2z: number = -fz;
+    let t: number;
+    let qx: number;
+    let qy: number;
+    let qz: number;
+    let qw: number;
+    if (m2z < 0) {
+      if (rx > uy) {
+        t = 1.0 + rx - uy - m2z;
+        qx = t;
+        qy = ry + ux;
+        qz = m2x + rz;
+        qw = uz - m2y;
+      } else {
+        t = 1.0 - rx + uy - m2z;
+        qx = ry + ux;
+        qy = t;
+        qz = uz + m2y;
+        qw = m2x - rz;
+      }
     } else {
-      const s: number = Math.sqrt(1 + m22 - m00 - m11) * 2;
-      qw = (m10 - m01) / s;
-      qx = (m02 + m20) / s;
-      qy = (m12 + m21) / s;
-      qz = 0.25 * s;
+      if (rx < -uy) {
+        t = 1.0 - rx - uy + m2z;
+        qx = m2x + rz;
+        qy = uz + m2y;
+        qz = t;
+        qw = ry - ux;
+      } else {
+        t = 1.0 + rx + uy + m2z;
+        qx = uz - m2y;
+        qy = m2x - rz;
+        qz = ry - ux;
+        qw = t;
+      }
     }
-    return { x: qx, y: qy, z: qz, w: qw };
+    const s: number = 0.5 / Math.sqrt(t);
+    return { x: qx * s, y: qy * s, z: qz * s, w: qw * s };
   }
 }
