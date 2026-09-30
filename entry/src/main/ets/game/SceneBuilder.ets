@@ -122,6 +122,9 @@ export class SceneBuilder {
 
     // 相机: 俯瞰视角, 按棋盘大小自动取景
     const camera: Camera = await rf.createCamera({ name: 'mainCamera' });
+    // 必须显式启用: 官方可运行示例 (OpenHarmony how-to-build-3d-model-viewer) 均设置 camera.enabled = true;
+    // 默认值为 false, 无启用相机时引擎完全不渲染 (黑屏且连 clearColor 都不生效)。
+    camera.enabled = true;
     camera.fov = Math.PI / 3;
     camera.nearPlane = 0.1;
     camera.farPlane = 200;
