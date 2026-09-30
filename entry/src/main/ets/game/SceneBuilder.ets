@@ -105,6 +105,7 @@ export class SceneBuilder {
       { r: 1.0, g: 0.42, b: 0.16, a: 1 });
     const ballGeo: SphereGeometry = new SphereGeometry();
     ballGeo.radius = ballRadius;
+    ballGeo.segmentCount = 32; // 必须显式设置, 默认为 0 会导致原生侧 rings/sectors=0 建网格失败
     const ballMesh = await rf.createMesh({ name: 'ballMesh' }, ballGeo);
     const ballNode: Geometry = await rf.createGeometry({ name: 'ballNode' }, ballMesh);
     SceneBuilder.applyMaterial(ballNode, ballMat);

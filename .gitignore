@@ -26,3 +26,10 @@ Thumbs.db
 *.hap
 *.hsp
 *.har
+
+# 签名私钥与材料 (不推送到远端, 本机保留)
+/signing/*
+!/signing/gen-material.js
+/maze.cer
+/maze-debugDebug.p7b
+/auto_debug_*.cer.cer
