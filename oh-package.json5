@@ -1,0 +1,10 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "harmonyos-maze",
+  "version": "1.0.0",
+  "description": "重力迷宫 - 晃动手机控制小球走出3D迷宫 (ArkGraphics 3D)",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {}
+}

@@ -1,0 +1,28 @@
+# 构建产物
+/build
+/entry/build
+/entry/.preview
+/.hvigor
+/.hvigor_output
+
+# 依赖
+/node_modules
+/oh_modules
+/entry/oh_modules
+
+# 本机环境配置 (SDK 路径因人而异)
+/local.properties
+
+# IDE
+/.idea
+/.fleet
+*.iml
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 打包产物
+*.hap
+*.hsp
+*.har

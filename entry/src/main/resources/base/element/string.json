@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "重力迷宫主模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "重力迷宫 - 晃动手机控制小球走出迷宫"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "重力迷宫"
+    }
+  ]
+}
