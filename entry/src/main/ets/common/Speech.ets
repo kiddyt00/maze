@@ -28,6 +28,15 @@ export class Speaker {
   private lang: string = '';
   private seq: number = 0;
   private busy: boolean = false;
+  private pending: (() => void) | null = null;
+
+  private releasePending(): void {
+    const p: (() => void) | null = this.pending;
+    if (p !== null) {
+      this.pending = null;
+      p();
+    }
+  }
 
   private async ensure(language: string): Promise<textToSpeech.TextToSpeechEngine> {
     if (this.engine !== null && this.lang === language) {
@@ -51,12 +60,18 @@ export class Speaker {
       },
       onComplete: (requestId: string, response: textToSpeech.CompleteResponse): void => {
         hilog.info(DOMAIN, TAG, 'tts complete %{public}s', requestId);
+        this.busy = false;
+        this.releasePending();
       },
       onStop: (requestId: string, response: textToSpeech.StopResponse): void => {
         hilog.info(DOMAIN, TAG, 'tts stop %{public}s', requestId);
+        this.busy = false;
+        this.releasePending();
       },
       onError: (requestId: string, errorCode: number, errorMessage: string): void => {
         hilog.error(DOMAIN, TAG, 'tts error %{public}d %{public}s', errorCode, errorMessage);
+        this.busy = false;
+        this.releasePending();
       }
     });
     this.engine = engine;
@@ -78,6 +93,42 @@ export class Speaker {
     this.busy = true;
   }
 
+  /** 朗读并等它播完 (最多等 timeoutMs, 防止回调丢失把流程卡死)。 */
+  async speakAndWait(text: string, language: string, timeoutMs: number): Promise<void> {
+    if (text.length === 0) {
+      return;
+    }
+    const wait: Promise<void> = new Promise<void>((resolve: () => void): void => {
+      this.pending = resolve;
+    });
+    await this.say(text, language);
+    const guard: Promise<void> = new Promise<void>((resolve: () => void): void => {
+      setTimeout((): void => {
+        resolve();
+      }, timeoutMs);
+    });
+    await Promise.race([wait, guard]);
+    this.releasePending();
+  }
+
+  /** 逐段朗读 (用于"一个字一个字慢慢读"的引导), 段间留一点停顿。 */
+  async saySeq(parts: string[], language: string, gapMs: number): Promise<void> {
+    for (let i: number = 0; i < parts.length; i++) {
+      const t: string = parts[i];
+      if (t.length === 0) {
+        continue;
+      }
+      await this.speakAndWait(t, language, 2500);
+      if (gapMs > 0) {
+        await new Promise<void>((resolve: () => void): void => {
+          setTimeout((): void => {
+            resolve();
+          }, gapMs);
+        });
+      }
+    }
+  }
+
   isBusy(): boolean {
     if (this.engine === null) {
       return false;
@@ -89,6 +140,7 @@ export class Speaker {
     if (this.engine !== null) {
       this.engine.stop();
     }
+    this.releasePending();
   }
 
   release(): void {

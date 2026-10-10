@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "TrailStory 游戏盒"
+    },
+    {
+      "name": "mic_reason",
+      "value": "跟读乐园需要使用麦克风录下小朋友的朗读，才能给出读音评分和引导"
     }
   ]
 }
