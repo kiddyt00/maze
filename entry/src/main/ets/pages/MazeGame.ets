@@ -1,11 +1,17 @@
+/**
+ * 子游戏: 重力迷宫。
+ * 目标: 晃动手机 -> 小球受"重力"滚动 -> 走到终点。
+ * 当前阶段 (M1): 静态场景渲染 + 相机/光照打通; 传感器倾斜控制在 M2。
+ */
 import { Scene } from '@kit.ArkGraphics3D';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { generateMaze } from '../game/MazeGen';
-import { SceneBuilder, MazeSceneRefs } from '../game/SceneBuilder';
+import { router } from '@kit.ArkUI';
+import { generateMaze } from '../games/maze/MazeGen';
+import { SceneBuilder, MazeSceneRefs } from '../games/maze/SceneBuilder';
 
 @Entry
 @Component
-struct Index {
+struct MazeGame {
   @State scene: Scene | undefined = undefined;
   @State statusText: string = '正在生成迷宫…';
   private refs: MazeSceneRefs | null = null;
@@ -13,6 +19,14 @@ struct Index {
 
   aboutToAppear(): void {
     this.startGame();
+  }
+
+  aboutToDisappear(): void {
+    if (this.refs !== null) {
+      this.refs.scene.destroy();
+      this.refs = null;
+    }
+    this.scene = undefined;
   }
 
   private startGame(): void {
@@ -40,16 +54,37 @@ struct Index {
 
   build() {
     Column() {
+      Row() {
+        Text('‹ 返回大厅')
+          .fontSize(15)
+          .fontColor('#9FB0CC')
+          .padding(8)
+          .onClick(() => {
+            router.back();
+          })
+        Text('重力迷宫')
+          .fontSize(17)
+          .fontColor(Color.White)
+          .fontWeight(FontWeight.Medium)
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+        Text('    ')
+          .fontSize(15)
+          .padding(8)
+      }
+      .width('100%')
+      .padding({ left: 6, right: 6, top: 4 })
+
       Text(this.statusText)
         .fontSize(15)
         .fontColor(Color.White)
         .width('100%')
         .textAlign(TextAlign.Center)
-        .padding({ top: 8, bottom: 4 })
+        .padding({ top: 6, bottom: 4 })
       if (this.scene !== undefined) {
         Component3D({ scene: this.scene })
           .width('100%')
-          .height('84%')
+          .height('76%')
       } else {
         // 场景构建中: 先占位, 避免以 undefined 创建 Component3D (SceneOptions 不可变, 后绑定 scene 无效)
         Stack() {
@@ -63,7 +98,7 @@ struct Index {
             .margin({ top: 90 })
         }
         .width('100%')
-        .height('84%')
+        .height('76%')
         .alignContent(Alignment.Center)
       }
       Button('重新生成迷宫')

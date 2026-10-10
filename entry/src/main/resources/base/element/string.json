@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "重力迷宫主模块"
+      "value": "TrailStory 游戏盒 主模块"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "重力迷宫 - 晃动手机控制小球走出迷宫"
+      "value": "TrailStory 游戏盒 - 重力迷宫 / 跟读乐园 等小游戏合集"
     },
     {
       "name": "EntryAbility_label",
-      "value": "重力迷宫"
+      "value": "TrailStory 游戏盒"
     }
   ]
 }
