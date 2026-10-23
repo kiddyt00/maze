@@ -2,6 +2,13 @@
   "src": [
     "pages/Lobby",
     "pages/MazeGame",
-    "pages/ReadGame"
+    "pages/ReadGame",
+    "pages/MathGame",
+    "pages/MemoryGame",
+    "pages/SchulteGame",
+    "pages/MoleGame",
+    "pages/PuzzleGame",
+    "pages/KidsMazePage",
+    "pages/MolePrimePage"
   ]
 }
